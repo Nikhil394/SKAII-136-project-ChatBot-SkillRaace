@@ -5,11 +5,10 @@ import torch
 import os
 from ics import Calendar, Event
 
-from model import NeuralNet
-from nltk_utils import bag_of_words, tokenize
+from chatbot_model import NeuralNet
+from chatbot_nltk_utils import bag_of_words, tokenize_text
 
-# Function to generate an iCalendar event on Linux
-def generate_ics_event(title, start_time, duration_minutes):
+def generate_calendar_event(title, start_time, duration_minutes):
     calendar = Calendar()
     event = Event()
     event.name = title
@@ -24,10 +23,10 @@ def generate_ics_event(title, start_time, duration_minutes):
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-with open('/home/shravan/Desktop/Internship/SkillRaace/Task_1/ChatBot/pytorch-chatbot/intents.json', 'r') as file:
+with open('intents.json', 'r') as file:
     intents = json.load(file)
 
-MODEL_PATH = "data.pth"
+MODEL_PATH = "model.pth"
 data = torch.load(MODEL_PATH)
 
 input_size = data["input_size"]
@@ -49,7 +48,7 @@ while True:
     if user_input.lower() == "quit":
         break
 
-    user_input = tokenize(user_input)
+    user_input = tokenize_text(user_input)
     X = bag_of_words(user_input, all_words)
     X = X.reshape(1, X.shape[0])
     X = torch.from_numpy(X).to(device)
@@ -68,10 +67,9 @@ while True:
                 print(f"{bot_name}: {response}")
 
                 if tag == "schedule_meeting":
-                    # For simplicity, using a fixed time and duration
                     start_time = datetime.datetime.now() + datetime.timedelta(days=1)
                     duration = 60  # 1 hour
-                    generate_ics_event("Meeting with Sam", start_time, duration)
+                    generate_calendar_event("Meeting with Sam", start_time, duration)
                 elif tag == "cancel_meeting":
                     print(f"{bot_name}: Sorry, cancelling a meeting isn't supported via this script.")
     else:
