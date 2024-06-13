@@ -2,7 +2,7 @@
 This chatBot is designed to give responses to quries.
 
 
-# Usage 
+## Usage 
 After installing necessary packages
 ## 1 Run train.py
 python train.py
